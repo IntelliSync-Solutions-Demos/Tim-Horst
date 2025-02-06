@@ -10,13 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
-  Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -278,6 +277,9 @@ export function Blog() {
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>{post.title}</DialogTitle>
+                    <DialogDescription>
+                      A detailed look into {post.title}, exploring key insights and expert advice.
+                    </DialogDescription>
                     <div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
                       <div className="flex items-center gap-1">
                         <User className="h-4 w-4" />

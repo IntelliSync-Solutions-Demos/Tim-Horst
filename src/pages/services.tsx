@@ -2,12 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppWindow as Window, DoorOpen, Home, PaintBucket, Hammer, Wrench, ChevronDown, ChevronUp, MapPin, Phone, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+
 
 const services = [
   {
