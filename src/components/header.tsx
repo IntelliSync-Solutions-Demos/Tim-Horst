@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },

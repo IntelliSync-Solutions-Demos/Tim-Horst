@@ -46,17 +46,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setAdminUsername(username);
         setLoginError(null);
 
-        // Persist login state and token
+        // Persist login state
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('adminUsername', username);
-        if (response.token) {
-          localStorage.setItem('authToken', response.token);
-        }
 
         return true;
       } else {
         // Handle login failure
-        setLoginError(response.error || 'Login failed');
+        setLoginError(response.message || 'Login failed');
         return false;
       }
     } catch  {
