@@ -15,12 +15,10 @@ export default defineConfig(({ mode }) => {
       exclude: ['lucide-react'],
     },
     define: {
-      ...Object.fromEntries(
-        Object.keys(process.env).map((key) => [
-          `import.meta.env.${key}`,
-          JSON.stringify(process.env[key]),
-        ])
-      ),
+      'import.meta.env.VITE_UPLOADTHING_API_KEY': JSON.stringify(env.VITE_UPLOADTHING_API_KEY || ''),
+      'import.meta.env.VITE_UPLOADTHING_TOKEN': JSON.stringify(env.VITE_UPLOADTHING_TOKEN || ''),
+      'import.meta.env.VITE_ADMIN_USERNAME': JSON.stringify(env.VITE_ADMIN_USERNAME || ''),
+      'import.meta.env.VITE_ADMIN_PASSWORD': JSON.stringify(env.VITE_ADMIN_PASSWORD || '')
     },
   };
 });
