@@ -15,9 +15,12 @@ export default defineConfig(({ mode }) => {
       exclude: ['lucide-react'],
     },
     define: {
-      'process.env': {
-        VITE_UPLOADTHING_API_KEY: env.VITE_UPLOADTHING_API_KEY || '',
-      },
+      ...Object.fromEntries(
+        Object.keys(process.env).map((key) => [
+          `import.meta.env.${key}`,
+          JSON.stringify(process.env[key]),
+        ])
+      ),
     },
   };
 });
