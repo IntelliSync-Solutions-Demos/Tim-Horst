@@ -75,7 +75,7 @@ const projectImages = [
   },
 ];
 
-// Product data (would typically come from CMS/Supabase)
+// Product data (would typically come from CMS)
 const products = [
   {
     id: 1,
@@ -87,12 +87,9 @@ const products = [
     features: [
       'Double-glazed for maximum insulation',
       'UV protection coating',
-      'Custom sizes available',
-      'Energy Star certified',
-    ],
-    tags: ['Featured', 'Best Seller'],
-    rating: 5,
-    reviews: 24,
+      'Noise reduction technology',
+      'Energy-efficient design'
+    ]
   },
   {
     id: 2,
@@ -319,7 +316,7 @@ export function Products() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none lg:grid-cols-4">
           <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
             <div className="flex flex-col items-center text-center">
               <Shield className="h-12 w-12 text-blue-600" />
@@ -407,7 +404,7 @@ export function Products() {
                       alt={product.name}
                       className="aspect-[4/3] w-full object-cover"
                     />
-                    {product.tags.length > 0 && (
+                    {product.tags && product.tags.length > 0 && (
                       <div className="absolute top-4 left-4 flex gap-2">
                         {product.tags.map((tag) => (
                           <Badge key={tag} variant="secondary">
