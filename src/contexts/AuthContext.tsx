@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 import { authService } from '@/services/authService';
 
 // Define the shape of the authentication context
-interface AuthContextType {
+export interface AuthContextType {
   isAdmin: boolean;
   adminUsername: string | null;
   login: (username: string, password: string) => Promise<boolean>;
@@ -105,10 +105,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 // Custom hook to use the auth context
-export const useAuth = () => {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}
