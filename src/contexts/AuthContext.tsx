@@ -1,23 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 import { authService } from '@/services/authService';
-
-// Define the shape of the authentication context
-export interface AuthContextType {
-  isAdmin: boolean;
-  adminUsername: string | null;
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  loginError: string | null;
-}
-
-// Create the context with a default value
-const AuthContext = createContext<AuthContextType>({
-  isAdmin: false,
-  adminUsername: null,
-  login: async () => false,
-  logout: () => {},
-  loginError: null,
-});
+import { AuthContext } from './auth-context-def';
 
 // Provider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -103,12 +86,3 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     </AuthContext.Provider>
   );
 };
-
-// Custom hook to use the auth context
-export function useAuth(): AuthContextType {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
