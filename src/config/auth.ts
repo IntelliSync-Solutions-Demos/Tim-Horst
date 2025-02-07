@@ -16,8 +16,8 @@ const developmentConfig: AuthConfig = {
 
 const getEnvVar = (key: string): string => {
   const value = import.meta.env[key];
-  if (value === undefined) {
-    console.warn(`Environment variable ${key} is not defined`);
+  if (!value) {
+    console.warn(`Environment variable ${key} is not defined or empty`);
     return '';
   }
   if (typeof value === 'string' && value.startsWith('${')) {

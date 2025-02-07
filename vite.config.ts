@@ -9,9 +9,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      ...process.env,
-      'import.meta.env.VITE_ADMIN_USERNAME': JSON.stringify(env.VITE_ADMIN_USERNAME || 'admin'),
-      'import.meta.env.VITE_ADMIN_PASSWORD': JSON.stringify(env.VITE_ADMIN_PASSWORD || 'admin123')
+      // Expose env variables to your application
+      'process.env': env
     },
     resolve: {
       alias: {
