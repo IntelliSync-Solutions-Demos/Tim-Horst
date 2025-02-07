@@ -2,6 +2,7 @@
 // In a real-world scenario, this would make an actual API call to a backend
 
 import { LoginCredentials } from '@/types/auth';
+import { authConfig, validateCredentials } from '@/config/auth';
 
 interface AuthResponse {
   success: boolean;
@@ -14,39 +15,31 @@ export const authService = {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Comprehensive environment variable logging
+    // Validate credentials in production environment
+    validateCredentials();
+
+    // Log environment context
     console.log('🌐 Environment Context:', {
       mode: import.meta.env.MODE,
       isProd: import.meta.env.PROD,
       isDev: import.meta.env.DEV,
-      nodeEnv: process.env.NODE_ENV
+      isDevConfig: authConfig.isDevelopment
     });
 
-    // Log all Vite environment variables
-    const viteEnvVars = Object.keys(import.meta.env)
-      .filter(key => key.startsWith('VITE_'))
-      .reduce((acc, key) => {
-        acc[key] = import.meta.env[key] ? '***' : 'UNDEFINED';
-        return acc;
-      }, {} as Record<string, string>);
-    
-    console.log('🔑 Vite Environment Variables:', viteEnvVars);
-
-    // In a real-world scenario, this would be an API call
-    const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
-    const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+    // Get admin credentials from config
+    const { username: ADMIN_USERNAME, password: ADMIN_PASSWORD } = authConfig.adminCredentials;
 
     // Detailed logging for credentials
     console.log('👤 Stored Admin Username:', ADMIN_USERNAME);
-    console.log('🔐 Stored Admin Password:', ADMIN_PASSWORD ? 'Password is set' : 'Password is NOT set');
+    console.log('🔐 Admin Password Status:', ADMIN_PASSWORD ? 'Password is set' : 'Password is NOT set');
     console.log('🚪 Attempted Login Username:', credentials.username);
-    console.log('🔑 Attempted Login Password:', credentials.password ? 'Password provided' : 'No password');
+    console.log('🔑 Login Attempt Status:', credentials.password ? 'Password provided' : 'No password');
 
     if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
       console.error('❌ Admin credentials not configured');
       return { 
         success: false, 
-        message: 'Authentication not configured: Missing environment variables' 
+        message: 'Authentication not configured: Missing credentials' 
       };
     }
 
@@ -65,7 +58,8 @@ export const authService = {
 
     console.warn('❌ Invalid credentials', {
       usernameMatch: isUsernameMatch,
-      passwordMatch: isPasswordMatch
+      passwordMatch: isPasswordMatch,
+      environment: authConfig.isDevelopment ? 'development' : 'production'
     });
 
     return { 
