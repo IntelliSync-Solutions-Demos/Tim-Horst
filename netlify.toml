@@ -5,6 +5,11 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  # Explicitly pass Vite environment variables
+  VITE_ADMIN_USERNAME = "${VITE_ADMIN_USERNAME}"
+  VITE_ADMIN_PASSWORD = "${VITE_ADMIN_PASSWORD}"
+  VITE_UPLOADTHING_API_KEY = "${VITE_UPLOADTHING_API_KEY}"
+  VITE_UPLOADTHING_TOKEN = "${VITE_UPLOADTHING_TOKEN}"
 
 [[redirects]]
   from = "/*"
