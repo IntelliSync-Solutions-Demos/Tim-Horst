@@ -1,15 +1,12 @@
 // Mock authentication service
 // In a real-world scenario, this would make an actual API call to a backend
 
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
+import { LoginCredentials } from '@/types/auth';
 
 interface AuthResponse {
   success: boolean;
-  token?: string;
-  error?: string;
+  message?: string;
+  user?: { username: string };
 }
 
 export const authService = {
@@ -17,34 +14,34 @@ export const authService = {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Use environment variables for credentials
+    // In a real-world scenario, this would be an API call
     const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
     const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
-    if (
-      credentials.username === ADMIN_USERNAME && 
-      credentials.password === ADMIN_PASSWORD
-    ) {
-      // Generate a mock JWT token
-      const token = btoa(JSON.stringify({
-        username: credentials.username,
-        exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hours from now
-      }));
+    if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+      console.warn('Admin credentials not configured');
+      return { success: false, message: 'Authentication not configured' };
+    }
 
-      return {
-        success: true,
-        token: token
+    if (credentials.username === ADMIN_USERNAME && credentials.password === ADMIN_PASSWORD) {
+      return { 
+        success: true, 
+        message: 'Login successful',
+        user: { username: credentials.username }
       };
     }
 
-    return {
-      success: false,
-      error: 'Invalid username or password'
+    return { 
+      success: false, 
+      message: 'Invalid credentials' 
     };
   },
 
   logout() {
     // In a real app, this might invalidate the token on the server
+    // Clear any authentication state
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('adminUsername');
     localStorage.removeItem('authToken');
   },
 

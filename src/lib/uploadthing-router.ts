@@ -1,18 +1,51 @@
 import { createUploadthing } from "uploadthing/server";
 import type { FileRouter, UploadedFileData } from "uploadthing/types";
-import { generateReactHelpers } from "@uploadthing/react";
-import { ourFileRouter as baseFileRouter } from "./uploadthing-router";
 import { z } from "zod";
 
 type Metadata = { userId: string } & Record<string, unknown>;
 
-type OurFileRouterType = FileRouter;
-
-// FileRouter for app, can contain multiple FileRoutes
 const f = createUploadthing();
 
-export const ourFileRouter: OurFileRouterType = {
-  ...baseFileRouter,
+export const ourFileRouter = {
+  productImage: f({ 
+    image: { maxFileSize: "4MB", maxFileCount: 1 } 
+  })
+    .middleware(async () => {
+      // Simple placeholder authentication
+      // TODO: Replace with proper authentication
+      return { userId: 'admin' };
+    })
+    .onUploadComplete(async ({ metadata, file }: { metadata: Metadata, file: UploadedFileData }) => {
+      console.log("Product image upload complete", { metadata, file });
+      return { url: file.url };
+    }),
+  
+  portfolioBeforeImage: f({ 
+    image: { maxFileSize: "4MB", maxFileCount: 1 } 
+  })
+    .middleware(async () => {
+      // Simple placeholder authentication
+      // TODO: Replace with proper authentication
+      return { userId: 'admin' };
+    })
+    .onUploadComplete(async ({ metadata, file }: { metadata: Metadata, file: UploadedFileData }) => {
+      console.log("Portfolio before image upload complete", { metadata, file });
+      return { url: file.url };
+    }),
+
+  portfolioAfterImage: f({ 
+    image: { maxFileSize: "4MB", maxFileCount: 1 } 
+  })
+    .middleware(async () => {
+      // Simple placeholder authentication
+      // TODO: Replace with proper authentication
+      return { userId: 'admin' };
+    })
+    .onUploadComplete(async ({ metadata, file }: { metadata: Metadata, file: UploadedFileData }) => {
+      console.log("Portfolio after image upload complete", { metadata, file });
+      return { url: file.url };
+    }),
+
   portfolioProject: f({ 
     image: { maxFileSize: "4MB", maxFileCount: 2 } 
   })
@@ -90,10 +123,7 @@ export const ourFileRouter: OurFileRouterType = {
       console.log(`Admin document upload for section ${metadata.section} by user ${metadata.userId}`);
       console.log("File URL", file.url);
       return { url: file.url };
-    })
-};
+    }),
+} satisfies FileRouter;
 
-export const { useUploadThing } = generateReactHelpers<typeof ourFileRouter>();
-
-// Export the type directly from the router file
-export type { OurFileRouter } from "./uploadthing-router";
+export type OurFileRouter = typeof ourFileRouter;
