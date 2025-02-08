@@ -1,10 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Linkedin, Twitter, Mail, MapPin, Phone, Lock } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Twitter, Mail, MapPin, Phone } from 'lucide-react';
 import { ProductsUploadModal } from "@/components/admin/products-upload-modal";
 import { PortfolioUploadModal } from "@/components/admin/portfolio-upload-modal";
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = {
   main: [
@@ -40,31 +37,6 @@ const navigation = {
 };
 
 export function Footer() {
-  const { isAdmin, adminUsername, login, logout, loginError } = useAuth();
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleAdminSignIn = () => {
-    setShowAdminModal(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      const success = await login(username, password);
-      if (success) {
-        setShowAdminModal(false);
-      }
-    } catch (error) {
-      console.error('Login failed', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <footer className="bg-gray-900 text-white py-8">
@@ -130,16 +102,7 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
-              {/* Admin Signin Link */}
-              <li>
-                <button 
-                  onClick={handleAdminSignIn}
-                  className="text-sm leading-6 text-gray-600 hover:text-blue-600 flex items-center gap-2"
-                >
-                  <Lock className="h-4 w-4" />
-                  Admin Signin
-                </button>
-              </li>
+
             </ul>
           </div>
         </div>
@@ -163,71 +126,15 @@ export function Footer() {
           &copy; {new Date().getFullYear()} Tim Horst. All rights reserved.
         </p>
 
-        {/* Admin Upload Buttons - Only visible when fully signed in */}
-        {isAdmin && adminUsername && (
-          <div className="fixed bottom-4 right-4 flex space-x-4">
-            <div className="bg-blue-600 rounded-md">
-              <ProductsUploadModal />
-            </div>
-            <div className="bg-green-600 rounded-md">
-              <PortfolioUploadModal />
-            </div>
-            <Button 
-              onClick={logout} 
-              variant="destructive" 
-              size="sm"
-            >
-              Logout
-            </Button>
+        {/* Admin Upload Buttons */}
+        <div className="fixed bottom-4 right-4 flex space-x-4">
+          <div className="bg-blue-500 rounded-md p-1">
+            <ProductsUploadModal />
           </div>
-        )}
-
-        {/* Admin Modal */}
-        {showAdminModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4 text-black">Admin Signin</h2>
-              <form onSubmit={handleSubmit}>
-                <input 
-                  type="text" 
-                  placeholder="Enter admin username" 
-                  className="w-full px-3 py-2 border rounded-md text-black placeholder-gray-600"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={isLoading}
-                />
-                <input 
-                  type="password" 
-                  placeholder="Enter admin password" 
-                  className="w-full px-3 py-2 border rounded-md mt-4 text-black placeholder-gray-600"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-                {loginError && (
-                  <p className="text-red-500 mt-2">{loginError}</p>
-                )}
-                <div className="flex space-x-2 mt-4">
-                  <button 
-                    type="submit"
-                    className="w-full bg-primary text-primary-foreground py-2 rounded-md hover:bg-primary/90"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Signing In...' : 'Sign In'}
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => setShowAdminModal(false)}
-                    className="w-full bg-secondary text-secondary-foreground py-2 rounded-md hover:bg-secondary/80"
-                    disabled={isLoading}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
+          <div className="bg-green-500 rounded-md p-1">
+            <PortfolioUploadModal />
           </div>
-        )}
+        </div>
       </div>
     </footer>
   );

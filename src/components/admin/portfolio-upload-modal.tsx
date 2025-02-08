@@ -38,7 +38,7 @@ const portfolioSchema = z.object({
   details: z.array(z.string()).optional(),
   testimonialContent: z.string().optional(),
   testimonialAuthor: z.string().optional(),
-  testimonialRating: z.coerce.number().min(1).max(5).optional(),
+  testimonialRole: z.string().optional(),
 });
 
 type PortfolioFormData = z.infer<typeof portfolioSchema>;
@@ -84,10 +84,10 @@ export function PortfolioUploadModal() {
         ...data,
         imageUrl,
         details: data.details?.filter(detail => detail.trim() !== '') || [],
-        testimonial: data.testimonialContent ? {
-          content: data.testimonialContent,
-          author: data.testimonialAuthor,
-          rating: data.testimonialRating || 5
+        testimonial: (watch('testimonialContent') && watch('testimonialAuthor')) ? {
+          quote: watch('testimonialContent') || '',
+          author: watch('testimonialAuthor') || '',
+          role: watch('testimonialRole') || 'Client'
         } : undefined
       };
 
@@ -200,40 +200,48 @@ export function PortfolioUploadModal() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Project Image</Label>
-              <UploadButton
-                endpoint="portfolioProject"
-                input={{
-                  title: watch('title') || 'Untitled Project',
-                  description: watch('description'),
-                  category: watch('category') || 'Uncategorized',
-                  location: watch('location') || 'Unknown',
-                  date: watch('date') || new Date().toISOString(),
-                  status: watch('status') || 'In Progress',
-                  details: watch('details'),
-                  testimonial: watch('testimonialContent') ? {
-                    content: watch('testimonialContent'),
-                    author: watch('testimonialAuthor'),
-                    rating: watch('testimonialRating')
-                  } : undefined
-                }}
-                appearance={{
-                  button: "bg-blue-500 text-white hover:bg-blue-600 rounded-md px-4 py-2 flex items-center justify-center gap-2",
-                  container: "w-full",
-                  allowedContent: "text-sm text-gray-600"
-                }}
-                content={{
-                  button({ ready }) {
-                    return (
-                      <div className="flex items-center gap-2">
-                        <Upload size={20} />
-                        {ready ? "Image Upload" : "Upload"}
-                      </div>
-                    );
-                  }
-                }}
-                onClientUploadComplete={onUploadComplete}
-                onUploadError={onUploadError}
-              />
+              <div className="space-y-2">
+                <UploadButton
+                  endpoint="portfolioProject"
+                  input={{
+                    title: watch('title') || 'Untitled Project',
+                    description: watch('description'),
+                    category: watch('category') || 'Uncategorized',
+                    location: watch('location') || 'Unknown',
+                    date: watch('date') || new Date().toISOString(),
+                    status: watch('status') || 'In Progress',
+                    details: watch('details'),
+                    testimonial: (watch('testimonialContent') && watch('testimonialAuthor')) ? {
+                      quote: watch('testimonialContent') || '',
+                      author: watch('testimonialAuthor') || '',
+                      role: watch('testimonialRole') || 'Client'
+                    } : undefined
+                  }}
+                  appearance={{
+                    button: "bg-blue-500 text-white hover:bg-blue-600 rounded-md px-4 py-2 flex items-center justify-center gap-2",
+                    container: "w-full",
+                    allowedContent: "text-sm text-gray-600"
+                  }}
+                  content={{
+                    button({ ready }) {
+                      return (
+                        <div className="flex items-center gap-2">
+                          <Upload size={20} />
+                          {ready ? "Image Upload" : "Upload"}
+                        </div>
+                      );
+                    }
+                  }}
+                  config={{
+                    mode: "auto"
+                  }}
+                  onClientUploadComplete={onUploadComplete}
+                  onUploadError={onUploadError}
+                />
+                <p className="text-sm text-gray-500">
+                  Accepted formats: JPEG, PNG, WebP, GIF (max 4MB)
+                </p>
+              </div>
               {imageUrl && (
                 <div className="mt-2">
                   <img 
@@ -291,22 +299,11 @@ export function PortfolioUploadModal() {
               />
             </div>
             <div>
-              <Label>Rating</Label>
-              <Select 
-                {...register('testimonialRating')}
-                onValueChange={(value) => setValue('testimonialRating', Number(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Rating" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5].map(rating => (
-                    <SelectItem key={rating} value={rating.toString()}>
-                      {rating} Star{rating !== 1 ? 's' : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Testimonial Role</Label>
+              <Input 
+                {...register('testimonialRole')} 
+                placeholder="Client Role" 
+              />
             </div>
           </div>
 
