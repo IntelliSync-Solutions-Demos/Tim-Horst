@@ -26,6 +26,10 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3000',
           changeOrigin: true
         },
+        '/api/portfolio': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
         '/api': {
           target: 'http://localhost:3000',
           changeOrigin: true,

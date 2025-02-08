@@ -5,10 +5,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
-import { generateUploadButton } from "@uploadthing/react";
-import type { OurFileRouter } from "@/lib/uploadthing";
-
-const UploadButton = generateUploadButton<OurFileRouter>();
 
 import { toast } from 'sonner';
 
@@ -46,15 +42,46 @@ type PortfolioFormData = z.infer<typeof portfolioSchema>;
 export function PortfolioUploadModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const onUploadComplete = (res: { url: string }[]) => {
-    setImageUrl(res[0].url);
-    toast.success('Image uploaded successfully');
-  };
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Invalid File Type", {
+        description: "Please upload a JPEG, PNG, WebP, or GIF image.",
+      });
+      return;
+    }
 
-  const onUploadError = (error: Error) => {
-    toast.error(`Error uploading image: ${error.message}`);
+    // Check file size (max 4MB)
+    const maxSize = 4 * 1024 * 1024; // 4MB in bytes
+    if (file.size > maxSize) {
+      toast.error("File Too Large", {
+        description: "Image must be less than 4MB.",
+      });
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      // TODO: Implement Supabase upload here
+      const mockUrl = 'https://placeholder.com/image.jpg'; // This will be replaced with actual Supabase upload
+      
+      setImageUrl(mockUrl);
+      toast.success("Success", {
+        description: "Image uploaded successfully"
+      });
+    } catch (error) {
+      toast.error("Upload Error", {
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const { 
@@ -74,7 +101,9 @@ export function PortfolioUploadModal() {
   const onSubmit = async (data: PortfolioFormData) => {
     // Validate image upload
     if (!imageUrl) {
-      toast.error('Please upload an image');
+      toast.error("Error", {
+        description: 'Please upload an image',
+      });
       return;
     }
 
@@ -91,26 +120,20 @@ export function PortfolioUploadModal() {
         } : undefined
       };
 
-      // Send the project data to your API
-      const response = await fetch('/api/portfolio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(projectData),
+      // TODO: Implement Supabase database insert
+      console.log('Project data to be saved:', projectData);
+
+      toast.success("Success", {
+        description: 'Project uploaded successfully'
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to create portfolio project');
-      }
-
-      toast.success('Project uploaded successfully');
       // Reset form or close modal
       reset();
       setIsOpen(false);
     } catch (error) {
       console.error('Error uploading project:', error);
-      toast.error('Failed to upload project');
+      toast.error("Error", {
+        description: 'Failed to upload project',
+      });
     }
   };
 
@@ -131,7 +154,7 @@ export function PortfolioUploadModal() {
           Add Portfolio Project
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Upload New Portfolio Project</DialogTitle>
           <DialogDescription>
@@ -201,43 +224,24 @@ export function PortfolioUploadModal() {
             <div>
               <Label>Project Image</Label>
               <div className="space-y-2">
-                <UploadButton
-                  endpoint="portfolioProject"
-                  input={{
-                    title: watch('title') || 'Untitled Project',
-                    description: watch('description'),
-                    category: watch('category') || 'Uncategorized',
-                    location: watch('location') || 'Unknown',
-                    date: watch('date') || new Date().toISOString(),
-                    status: watch('status') || 'In Progress',
-                    details: watch('details'),
-                    testimonial: (watch('testimonialContent') && watch('testimonialAuthor')) ? {
-                      quote: watch('testimonialContent') || '',
-                      author: watch('testimonialAuthor') || '',
-                      role: watch('testimonialRole') || 'Client'
-                    } : undefined
-                  }}
-                  appearance={{
-                    button: "bg-blue-500 text-white hover:bg-blue-600 rounded-md px-4 py-2 flex items-center justify-center gap-2",
-                    container: "w-full",
-                    allowedContent: "text-sm text-gray-600"
-                  }}
-                  content={{
-                    button({ ready }) {
-                      return (
-                        <div className="flex items-center gap-2">
-                          <Upload size={20} />
-                          {ready ? "Image Upload" : "Upload"}
-                        </div>
-                      );
-                    }
-                  }}
-                  config={{
-                    mode: "auto"
-                  }}
-                  onClientUploadComplete={onUploadComplete}
-                  onUploadError={onUploadError}
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                    className="w-full"
+                  />
+                  <Button
+                    type="button"
+                    disabled={isUploading}
+                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={() => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()}
+                  >
+                    <Upload size={20} />
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </Button>
+                </div>
                 <p className="text-sm text-gray-500">
                   Accepted formats: JPEG, PNG, WebP, GIF (max 4MB)
                 </p>

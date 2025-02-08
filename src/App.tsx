@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster as UIToaster } from '@/components/ui/toaster';
+import { Toaster } from 'sonner';
 import { Layout } from '@/components/layout';
 import { Routes } from '@/components/routes';
 
@@ -9,6 +10,7 @@ function App() {
       <Layout>
         <Routes />
       </Layout>
+      <UIToaster />
       <Toaster />
     </ThemeProvider>
   );

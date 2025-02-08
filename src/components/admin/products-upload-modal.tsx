@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useUploadThing } from "@/lib/uploadthing";
+
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { supabase } from '@/lib/supabase';
 
 const productSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -34,32 +35,52 @@ export function ProductsUploadModal() {
     resolver: zodResolver(productSchema)
   });
 
-  const { startUpload, isUploading } = useUploadThing("productImage", {
-    onClientUploadComplete: (res: { url: string }[]) => {
-      const uploadedImageUrl = res[0].url;
-      setImageUrl(uploadedImageUrl);
-      setValue('imageUrl', uploadedImageUrl);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const startUpload = async (metadata: { title: string; description?: string; category: string; price: string }) => {
+    try {
+      setIsUploading(true);
+      
+      // Upload the product data to Supabase
+      const { data, error } = await supabase
+        .from('products')
+        .insert([
+          {
+            title: metadata.title,
+            description: metadata.description,
+            category: metadata.category,
+            price: parseFloat(metadata.price),
+            image_url: imageUrl // Using the image URL from the state
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setImageUrl(data.image_url);
+      setValue('imageUrl', data.image_url);
+      
       toast({
         title: "Image Uploaded",
-        description: "Your product image has been successfully uploaded.",
-        status: "success"
+        description: "Your product image has been successfully uploaded."
       });
-    },
-    onUploadError: (error: Error) => {
+    } catch (error) {
       toast({
         title: "Upload Error",
-        description: `ERROR! ${error.message}`,
-        status: "error"
+        description: error instanceof Error ? error.message : 'Failed to upload image'
       });
-    },
-  });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const onSubmit = async (data: ProductFormData) => {
     if (!imageUrl) {
       toast({
         title: "Upload Required",
         description: "Please upload an image before submitting.",
-        status: "error"
+        variant: "destructive"
       });
       return;
     }
@@ -80,7 +101,7 @@ export function ProductsUploadModal() {
       toast({
         title: "Invalid File Type",
         description: "Please upload a JPEG, PNG, WebP, or GIF image.",
-        status: "error"
+        variant: "destructive"
       });
       return;
     }
@@ -91,12 +112,12 @@ export function ProductsUploadModal() {
       toast({
         title: "File Too Large",
         description: "Image must be less than 5MB.",
-        status: "error"
+        variant: "destructive"
       });
       return;
     }
 
-    await startUpload([file], {
+    await startUpload({
       title: getValues('title'),
       description: getValues('description'),
       category: "products",
@@ -136,7 +157,7 @@ export function ProductsUploadModal() {
             <Label>Product Price</Label>
             <Input 
               type="number" 
-              {...register('price')} 
+              {...register('price', { valueAsNumber: true })} 
               placeholder="Enter product price" 
             />
             {errors.price && <p className="text-red-500">{errors.price.message}</p>}
