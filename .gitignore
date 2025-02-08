@@ -25,3 +25,7 @@ local.env
 *.sln
 *.sw?
 .env.production
+
+# TypeScript build artifacts
+*.tsbuildinfo
+*.d.ts.map
